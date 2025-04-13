@@ -1,33 +1,31 @@
-"""
-This program to start server for Emotion Detection
-"""
 from flask import Flask, render_template, request
 from EmotionDetection.emotion_detection import emotion_detector
 
-## Initiate Flask app
-app = Flask(__name__)
-
-@app.route("/")
-def home():
-    """Define a route for the root URL ("/")
-    Returns:
-        The return value of the function.
-    """
-    return render_template('index.html')
+app = Flask("Emotion Detector")
 
 @app.route("/emotionDetector")
-def call_emotion():
-    """Define a rourte for URL ("/emotionDetector")
-    Returns:
-        The emotion list of given text
-    """
-    text = request.args.get("textToAnalyze")
-    result = emotion_detector(text)
+def emotion_detector_function():
+    ''' This function calls the application
+    '''
+    test_to_analyze = request.args.get('textToAnalyze')
+    response = emotion_detector(text_to_analyze)
 
-    if result['dominant_emotion'] is None:
-        return 'Invalid text! Please try again!'
+    if response['dominant_emotion'] is None:
+        response_text = "Invalid Input! Please try again."
+    else:
+        response_text = f"For the given statement, the system response is 'anger': \
+                    {response['anger']}, 'disgust': {response['disgust']}, \
+                    'fear': {response['fear']}, 'joy': {response['joy']}, \
+                    'sadness': {response['sadness']}. The dominant emotion is \
+                    {response['dominant_emotion']}."
 
-    return result
+    return response_text
+
+@app.route("\")
+def render_index_page():
+    ''' This is the function to render the html interface
+    '''
+    return render_template('index.html')
 
 if __name__ == "__main__":
     app.run(host = "0.0.0.0", port = 5000)
