@@ -13,18 +13,17 @@ def emotion_detector(text_to_analyse):
         "raw_document": {
             "text": text_to_analyse
         }
-    }
-
-    if text_to_analyse.strip() == '':
-        
+    }        
 
     try:
         response = requests.post(url, headers=headers, data=json.dumps(payload))
-        response.raise_for_status()
+        status_code = response.status_code
+
+        emotion_dict = {}
 
         # return all key values with None for server response to blank entry
-        if response.status_code == 400:
-            return { 
+        if status_code == 400:
+            emotion_dict = { 
                 "anger": None, 
                 "disgust": None, 
                 "fear": None, 
@@ -32,10 +31,10 @@ def emotion_detector(text_to_analyse):
                 "sadness": None,
                 "dominant_emotion": None 
                 }
+            return emotion_dict
 
         result = json.loads(response.text)
         emotionPredictions = result['emotionPredictions']
-        emotion_dict = {}
 
         for item in emotionPredictions:
             if 'emotion' in item:
@@ -49,6 +48,7 @@ def emotion_detector(text_to_analyse):
                 emotion_dict['dominant_emotion'] = dominant_emotion
 
         return emotion_dict
+
     except requests.exceptions.RequestException as e:
         print("Error calling the API:", e)
         return None
