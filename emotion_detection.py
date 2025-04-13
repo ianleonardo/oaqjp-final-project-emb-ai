@@ -15,9 +15,24 @@ def emotion_detector(text_to_analyse):
         }
     }
 
+    if text_to_analyse.strip() == '':
+        
+
     try:
         response = requests.post(url, headers=headers, data=json.dumps(payload))
         response.raise_for_status()
+
+        # return all key values with None for server response to blank entry
+        if response.status_code == 400:
+            return { 
+                "anger": None, 
+                "disgust": None, 
+                "fear": None, 
+                "joy": None, 
+                "sadness": None,
+                "dominant_emotion": None 
+                }
+
         result = json.loads(response.text)
         emotionPredictions = result['emotionPredictions']
         emotion_dict = {}
@@ -27,7 +42,6 @@ def emotion_detector(text_to_analyse):
                 emotions = item['emotion']
                 score = 0
                 for key,value in emotions.items():
-                    #print(f"Key: {key}, Value: {value}")
                     emotion_dict[key] = value
                     if (score < value):
                         dominant_emotion = key
